@@ -8,6 +8,10 @@ dependencies = [
     "alembic",
     "pydantic",
     "psycopg[binary]",
+    "google-api-python-client",
+    "google-auth",
+    "google-auth-httplib2",
+    "google-auth-oauthlib",
 ]
 
 [build-system]
