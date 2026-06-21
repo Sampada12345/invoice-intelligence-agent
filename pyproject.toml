@@ -7,11 +7,17 @@ dependencies = [
     "sqlalchemy",
     "alembic",
     "pydantic",
+    "email-validator",
     "psycopg[binary]",
     "google-api-python-client",
     "google-auth",
     "google-auth-httplib2",
     "google-auth-oauthlib",
+    "openai",
+    "pillow",
+    "pymupdf",
+    "pypdf",
+    "pytesseract",
 ]
 
 [build-system]
