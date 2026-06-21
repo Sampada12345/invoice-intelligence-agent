@@ -10,6 +10,7 @@ This document defines the **target repository tree only**. It does not include i
 invoice-intelligence-agent/
 ├── README.md
 ├── .env.example
+├── requirements.txt
 ├── pyproject.toml
 ├── alembic.ini
 ├── Dockerfile
@@ -208,6 +209,7 @@ invoice-intelligence-agent/
 |---|---|---|---|
 | `README.md` | repository entry point and contributor orientation | `docs/architecture.md`, `docs/repository-structure.md` | contributors, CI reviewers |
 | `.env.example` | documents required environment variables | `config/settings.py`, `config/security.py` | local setup, Docker, scripts |
+| `requirements.txt` | pip-compatible dependency list mirroring runtime packages | `pyproject.toml` | Docker builds, local installs, CI |
 | `pyproject.toml` | Python package metadata and dependency declarations | none | all Python source, CI, Docker build |
 | `alembic.ini` | database migration configuration | `db/session.py`, `db/base.py` | migration commands, CI |
 | `Dockerfile` | production image definition | `pyproject.toml`, `src/`, `scripts/` | `docker-compose.yml`, CI docker build |

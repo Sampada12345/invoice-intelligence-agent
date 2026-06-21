@@ -216,6 +216,7 @@ invoice-intelligence-agent/
 │   ├── seed_demo_data.py
 │   └── rotate_tokens.py
 ├── .env.example
+├── requirements.txt
 ├── pyproject.toml
 ├── Dockerfile
 ├── docker-compose.yml
@@ -290,6 +291,7 @@ Operational utilities for local bootstrap, demo setup, and controlled token main
 
 ### Root config files
 
+- **requirements.txt**: pip-compatible dependency list for deployment and runtime installs.
 - **pyproject.toml**: Python project metadata and dependency management.
 - **Dockerfile** / **docker-compose.yml**: containerization and local multi-container orchestration.
 - **alembic.ini**: migration configuration.

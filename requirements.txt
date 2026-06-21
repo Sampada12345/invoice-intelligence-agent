@@ -1,0 +1,17 @@
+sqlalchemy
+alembic
+pydantic
+email-validator
+httpx
+psycopg[binary]
+google-api-python-client
+google-auth
+google-auth-httplib2
+google-auth-oauthlib
+langgraph
+openai
+pillow
+pymupdf
+pypdf
+pytesseract
+streamlit
