@@ -1,0 +1,34 @@
+[project]
+name = "invoice-intelligence-agent"
+version = "0.1.0"
+description = "Invoice Intelligence Agent"
+requires-python = ">=3.11"
+dependencies = [
+    "sqlalchemy",
+    "alembic",
+    "pydantic",
+    "email-validator",
+    "httpx",
+    "psycopg[binary]",
+    "google-api-python-client",
+    "google-auth",
+    "google-auth-httplib2",
+    "google-auth-oauthlib",
+    "langgraph",
+    "openai",
+    "pillow",
+    "pymupdf",
+    "pypdf",
+    "pytesseract",
+    "streamlit",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
