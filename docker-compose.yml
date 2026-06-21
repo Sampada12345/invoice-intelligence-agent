@@ -1,0 +1,119 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - invoice-agent
+
+  agent-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      AGENT_SERVICE_HOST: ${AGENT_SERVICE_HOST}
+      AGENT_SERVICE_PORT: ${AGENT_SERVICE_PORT}
+      APP_ENV: ${APP_ENV}
+      SERVICE_NAME: ${SERVICE_NAME}
+    command: ["python", "-m", "invoice_agent.runtime.agent_service"]
+    volumes:
+      - app_data:/app/data
+      - ./secrets:/app/secrets:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:${AGENT_SERVICE_PORT}/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    expose:
+      - "${AGENT_SERVICE_PORT}"
+    ports:
+      - "${AGENT_SERVICE_EXTERNAL_PORT:-8081}:${AGENT_SERVICE_PORT}"
+    networks:
+      - invoice-agent
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      APP_ENV: ${APP_ENV}
+      AGENT_SERVICE_INTERNAL_URL: http://agent-service:${AGENT_SERVICE_PORT}
+    command:
+      [
+        "streamlit",
+        "run",
+        "src/invoice_agent/dashboard/app.py",
+        "--server.address=0.0.0.0",
+        "--server.port=8501",
+        "--server.headless=true",
+        "--browser.gatherUsageStats=false"
+      ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      agent-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8501/_stcore/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    expose:
+      - "8501"
+    networks:
+      - invoice-agent
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      streamlit:
+        condition: service_healthy
+      agent-service:
+        condition: service_healthy
+    ports:
+      - "${NGINX_PORT:-8088}:80"
+    volumes:
+      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://127.0.0.1/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - invoice-agent
+
+volumes:
+  postgres_data:
+  app_data:
+
+networks:
+  invoice-agent:
+    driver: bridge
