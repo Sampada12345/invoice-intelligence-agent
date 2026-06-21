@@ -8,6 +8,7 @@ dependencies = [
     "alembic",
     "pydantic",
     "email-validator",
+    "httpx",
     "psycopg[binary]",
     "google-api-python-client",
     "google-auth",
